@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>引っ越し費用シミュレーター｜人数・時期・距離から相場がすぐわかる</title>
+<meta name="description" content="人数・引っ越しの月・距離を選ぶだけで、引っ越し料金の相場の目安がわかる無料シミュレーター。繁忙期との差額や安くするコツも。">
+<style>:root{--c:#1c5a78}*{box-sizing:border-box}body{margin:0;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#fff8ec;color:#222;line-height:1.7}
+header{background:var(--c);color:#fff;padding:26px 16px 20px;text-align:center}header h1{margin:0;font-size:1.4rem}header p{margin:6px 0 0;opacity:.85;font-size:.9rem}
+.pr{font-size:.78rem;color:#888;text-align:center;margin:10px 0 0}main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+label{display:block;font-weight:700;color:#1f2d54;margin:14px 0 6px}.hint{font-weight:400;color:#888;font-size:.82rem}
+input,select{width:100%;font-size:16px;padding:10px 12px;border:2px solid #dde;border-radius:10px;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--c)}.row{display:flex;gap:10px}.row>div{flex:1}
+button{width:100%;margin-top:18px;padding:14px;font-size:1.05rem;font-weight:700;color:#fff;background:#c83232;border:0;border-radius:12px;cursor:pointer}
+button.sub{background:#fff;color:var(--c);border:2px solid var(--c);margin-top:10px;padding:10px}
+.res{text-align:center}.big{font-size:2.3rem;font-weight:900;color:#c83232;margin:4px 0}.muted{color:#5a5a5a;font-size:.9rem}
+h2{font-size:1.1rem;color:#1f2d54;margin:0 0 10px}.links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.links a{display:block;text-align:center;padding:13px 8px;border-radius:12px;color:#fff;text-decoration:none;font-weight:700;background:var(--c)}
+.links a.main{grid-column:1/-1;background:#c83232;font-size:1.05rem}.note{font-size:.8rem;color:#777}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{border-bottom:1px solid #eee;padding:6px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+footer{text-align:center;font-size:.75rem;color:#999;padding:24px 16px 40px}
+</style></head><body>
+<header><h1>引っ越し費用シミュレーター</h1><p>人数・時期・距離を選ぶだけ｜相場の目安がすぐわかる</p></header>
+<p class="pr">※このページはアフィリエイト広告（PR）を利用しています</p>
+<main>
+<div class="card">
+  <label>人数・荷物量</label>
+  <select id="ppl">
+    <option value="0">単身（荷物少なめ）</option><option value="1">単身（荷物多め）</option>
+    <option value="2" selected>2人家族</option><option value="3">3人家族</option><option value="4">4人家族</option>
+  </select>
+  <label>引っ越しする月</label>
+  <select id="month"></select>
+  <label>移動距離</label>
+  <select id="dist">
+    <option value="0">同じ市区町村内（〜15km）</option><option value="1" selected>同じ都道府県内（〜50km）</option>
+    <option value="2">同じ地方内（〜200km）</option><option value="3">近隣の地方（〜500km）</option><option value="4">遠距離（500km以上）</option>
+  </select>
+  <button id="go">相場を調べる</button>
+</div>
+<div class="card res" id="res" style="display:none">
+  <div class="muted">引っ越し料金の相場（目安）</div>
+  <div class="big" id="price"></div>
+  <div class="muted" id="cmp"></div>
+</div>
+<div class="card" id="cta" style="display:none">
+  <h2>料金は業者ごとに大きく違います</h2>
+  <p class="note">同じ条件でも、業者によって数万円の差が出ることがあります。一括見積もりなら一度の入力で複数社を比べられます。</p>
+  <div class="links" id="links"></div>
+</div>
+<div class="card"><h2>安くする4つのコツ</h2>
+<p class="note">1. 複数社の見積もりを比べる　2. 3月下旬〜4月上旬を避ける　3. 平日・時間おまかせ（フリー便）にする　4. 不用品を処分して荷物を減らす</p></div>
+<div class="card"><h2>計算の根拠</h2>
+<p class="note">人数・時期別の平均はSUUMO引越し見積もりのデータ（通常期5〜1月／繁忙期2〜4月）、距離による差は引越し侍の距離別相場をもとにした概算です。実際の料金は荷物量・建物の条件・オプションで変わるため、必ず見積もりで確認してください。</p></div>
+</main>
+<footer>2026年11月時点の公表データをもとに作成</footer>
+<script>
+/* ===== 設定 ===== 空欄のリンクは表示されません */
+const RAKUTEN_AFF_ID = "";          // 楽天アフィリエイトID
+const ASP_LINKS = [                  // ASPで発行した一括見積もりの広告リンク
+  { label: "一括見積もりで比較する（1）", url: "", main: true },
+  { label: "一括見積もりで比較する（2）", url: "", main: true },
+];
+function affUrl(url){if(!RAKUTEN_AFF_ID)return url;return "https://hb.afl.rakuten.co.jp/hgc/"+RAKUTEN_AFF_ID+"/?pc="+encodeURIComponent(url)+"&m="+encodeURIComponent(url)}
+function rakuten(kw){return affUrl("https://search.rakuten.co.jp/search/mall/"+encodeURIComponent(kw)+"/")}
+function yen(n){return Math.round(n).toLocaleString("ja-JP")+"円"}
+function linkHtml(list){return list.filter(l=>l.url).map(l=>'<a class="'+(l.main?"main":"")+'" href="'+l.url+'" target="_blank" rel="sponsored noopener">'+l.label+'</a>').join("")}
+
+const BASE = [[46831,57832],[60443,81903],[78766,105231],[97103,130295],[120201,165875]];
+const DIST = [0.85,1.0,1.45,2.1,3.3];
+const msel = document.getElementById("month");
+for (let m=1;m<=12;m++) msel.innerHTML += '<option value="'+m+'"'+(m===3?' selected':'')+'>'+m+'月'+(m>=2&&m<=4?'（繁忙期）':'')+'</option>';
+document.getElementById("go").addEventListener("click", ()=>{
+  const p=+document.getElementById("ppl").value, m=+msel.value, d=+document.getElementById("dist").value;
+  const busy = m>=2&&m<=4;
+  const mid = BASE[p][busy?1:0]*DIST[d];
+  const lo = Math.floor(mid*0.8/1000)*1000, hi = Math.ceil(mid*1.2/1000)*1000;
+  document.getElementById("res").style.display="block";
+  document.getElementById("price").textContent = yen(lo)+"〜"+yen(hi);
+  const other = BASE[p][busy?0:1]*DIST[d];
+  document.getElementById("cmp").textContent = busy
+    ? "通常期（5〜1月）にずらすと、平均で約"+yen(Math.round((mid-other)/1000)*1000)+"安くなる可能性があります"
+    : "繁忙期（2〜4月）より、平均で約"+yen(Math.round((other-mid)/1000)*1000)+"安い時期です";
+  const links = ASP_LINKS.concat([
+    { label:"ダンボール・梱包資材", url: rakuten("引っ越し ダンボール セット") },
+    { label:"新生活の家電セット", url: rakuten("新生活 家電セット") },
+  ]);
+  document.getElementById("links").innerHTML = linkHtml(links);
+  document.getElementById("cta").style.display="block";
+  document.getElementById("res").scrollIntoView({behavior:"smooth"});
+});
+</script></body></html>

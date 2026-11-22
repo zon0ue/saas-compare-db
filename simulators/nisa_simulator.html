@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NISA積立シミュレーター｜毎月の積立額から将来の金額を計算</title>
+<meta name="description" content="毎月の積立額・期間・想定利回りを入れるだけで、NISAで積立投資した場合の将来の金額と非課税メリットを計算できる無料シミュレーター。">
+<style>:root{--c:#14463c}*{box-sizing:border-box}body{margin:0;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#fff8ec;color:#222;line-height:1.7}
+header{background:var(--c);color:#fff;padding:26px 16px 20px;text-align:center}header h1{margin:0;font-size:1.4rem}header p{margin:6px 0 0;opacity:.85;font-size:.9rem}
+.pr{font-size:.78rem;color:#888;text-align:center;margin:10px 0 0}main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+label{display:block;font-weight:700;color:#1f2d54;margin:14px 0 6px}.hint{font-weight:400;color:#888;font-size:.82rem}
+input,select{width:100%;font-size:16px;padding:10px 12px;border:2px solid #dde;border-radius:10px;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--c)}.row{display:flex;gap:10px}.row>div{flex:1}
+button{width:100%;margin-top:18px;padding:14px;font-size:1.05rem;font-weight:700;color:#fff;background:#c83232;border:0;border-radius:12px;cursor:pointer}
+button.sub{background:#fff;color:var(--c);border:2px solid var(--c);margin-top:10px;padding:10px}
+.res{text-align:center}.big{font-size:2.3rem;font-weight:900;color:#c83232;margin:4px 0}.muted{color:#5a5a5a;font-size:.9rem}
+h2{font-size:1.1rem;color:#1f2d54;margin:0 0 10px}.links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.links a{display:block;text-align:center;padding:13px 8px;border-radius:12px;color:#fff;text-decoration:none;font-weight:700;background:var(--c)}
+.links a.main{grid-column:1/-1;background:#c83232;font-size:1.05rem}.note{font-size:.8rem;color:#777}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{border-bottom:1px solid #eee;padding:6px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+footer{text-align:center;font-size:.75rem;color:#999;padding:24px 16px 40px}
+
+.fig{position:relative;height:260px;margin-top:10px}.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.grid3 div{background:#f6f6f6;border-radius:10px;padding:8px}.grid3 b{display:block;font-size:1.05rem;color:#1f2d54}
+.warn{color:#c83232;font-size:.85rem;margin-top:8px}
+</style></head><body>
+<header><h1>NISA積立シミュレーター</h1><p>毎月の積立額から、将来の金額と非課税メリットを計算</p></header>
+<p class="pr">※このページはアフィリエイト広告（PR）を利用しています</p>
+<main>
+<div class="card">
+  <label>毎月の積立額<span class="hint">　円</span></label>
+  <input id="m" type="number" inputmode="numeric" value="30000" step="1000">
+  <div class="row">
+    <div><label>積立期間<span class="hint">　年</span></label><input id="y" type="number" inputmode="numeric" value="20" min="1" max="50"></div>
+    <div><label>想定利回り<span class="hint">　年%</span></label><input id="r" type="number" inputmode="decimal" value="3" step="0.5"></div>
+  </div>
+  <label>最初にまとめて入れる額<span class="hint">　円（なければ0）</span></label>
+  <input id="init" type="number" inputmode="numeric" value="0" step="10000">
+</div>
+<div class="card res">
+  <div class="muted" id="lab">20年後の金額（試算）</div>
+  <div class="big" id="total">-</div>
+  <div class="grid3"><div>元本<b id="prin"></b></div><div>運用益<b id="gain"></b></div><div>非課税で<br>浮く税金<b id="tax"></b></div></div>
+  <div class="warn" id="warn"></div>
+  <div class="fig"><svg id="chart"></svg></div>
+</div>
+<div class="card"><h2>NISA口座を開く</h2>
+  <p class="note">NISA口座は1人1つの金融機関でしか開けません。手数料や取り扱い商品、ポイント投資の有無で比べましょう。</p>
+  <div class="links" id="links"></div></div>
+<div class="card"><h2>NISAの枠（2026年11月時点）</h2>
+<table><tr><th>項目</th><th>内容</th></tr>
+<tr><td>年間投資枠</td><td>つみたて120万円＋成長240万円</td></tr>
+<tr><td>生涯の非課税保有限度額</td><td>1,800万円</td></tr>
+<tr><td>こどもNISA（2027年1月〜）</td><td>年60万円・上限600万円</td></tr></table>
+<p class="note">※試算は一定の利回りが続くと仮定したもので、将来の成果を保証するものではありません。投資には元本割れのリスクがあります。非課税額は運用益×20.315%で計算しています。</p></div>
+</main>
+<footer>情報提供を目的としたもので、特定の金融商品を勧めるものではありません</footer>
+<script>
+/* ===== 設定 ===== */
+const RAKUTEN_AFF_ID = "";
+const ASP_LINKS = [ {label:"証券口座を開く（1）",url:"",main:true}, {label:"証券口座を開く（2）",url:"",main:true} ];
+function affUrl(url){if(!RAKUTEN_AFF_ID)return url;return "https://hb.afl.rakuten.co.jp/hgc/"+RAKUTEN_AFF_ID+"/?pc="+encodeURIComponent(url)+"&m="+encodeURIComponent(url)}
+function rakuten(kw){return affUrl("https://search.rakuten.co.jp/search/mall/"+encodeURIComponent(kw)+"/")}
+function yen(n){return Math.round(n).toLocaleString("ja-JP")+"円"}
+function linkHtml(list){return list.filter(l=>l.url).map(l=>'<a class="'+(l.main?"main":"")+'" href="'+l.url+'" target="_blank" rel="sponsored noopener">'+l.label+'</a>').join("")}
+
+function man(n){return n>=1e8?(n/1e8).toFixed(2)+"億円":Math.round(n/1e4).toLocaleString("ja-JP")+"万円"}
+function calc(){
+  const m=+document.getElementById("m").value||0, y=Math.min(50,Math.max(1,+document.getElementById("y").value||1)),
+        r=(+document.getElementById("r").value||0)/100, init=+document.getElementById("init").value||0, i=r/12;
+  const pts=[]; let bal=init, prin=init;
+  for(let k=1;k<=y*12;k++){ bal=(bal+m)*(1+i); prin+=m; if(k%12===0) pts.push([bal,prin]); }
+  const gain=bal-prin;
+  document.getElementById("lab").textContent=y+"年後の金額（試算）";
+  document.getElementById("total").textContent=man(bal);
+  document.getElementById("prin").textContent=man(prin);
+  document.getElementById("gain").textContent=man(gain);
+  document.getElementById("tax").textContent=man(Math.max(0,gain)*0.20315);
+  const w=[]; if(m*12>1200000&&m*12<=3600000) w.push("年間120万円を超える分は成長投資枠を使います。");
+  if(m*12+(init>0?0:0)>3600000) w.push("年間の投資枠（360万円）を超えています。");
+  if(prin>18000000) w.push("元本が生涯の非課税枠（1,800万円）を超えています。超えた分は課税口座になります。");
+  document.getElementById("warn").textContent=w.join(" ");
+  draw(pts);
+}
+function draw(pts){
+  const s=document.getElementById("chart"), W=s.clientWidth||600, H=s.clientHeight||260, L=8,R=W-8,T=10,B=H-24;
+  const mx=Math.max(...pts.map(p=>p[0]),1), n=pts.length;
+  const x=k=>L+(R-L)*(k+1)/n, yv=v=>B-(B-T)*v/mx;
+  let bars="";
+  pts.forEach((p,k)=>{const bw=Math.max(2,(R-L)/n-3), xx=x(k)-bw;
+    bars+='<rect x="'+xx+'" y="'+yv(p[1])+'" width="'+bw+'" height="'+(B-yv(p[1]))+'" fill="#1f2d54"/>'
+        +'<rect x="'+xx+'" y="'+yv(p[0])+'" width="'+bw+'" height="'+Math.max(0,yv(p[1])-yv(p[0]))+'" fill="#f08228"/>';});
+  s.innerHTML=bars+'<text x="'+L+'" y="'+(H-6)+'" font-size="12" fill="#777">1年</text><text x="'+(R-30)+'" y="'+(H-6)+'" font-size="12" fill="#777">'+n+'年</text>'
+    +'<rect x="'+L+'" y="'+T+'" width="10" height="10" fill="#1f2d54"/><text x="'+(L+14)+'" y="'+(T+10)+'" font-size="12" fill="#555">元本</text>'
+    +'<rect x="'+(L+56)+'" y="'+T+'" width="10" height="10" fill="#f08228"/><text x="'+(L+70)+'" y="'+(T+10)+'" font-size="12" fill="#555">運用益</text>';
+}
+["m","y","r","init"].forEach(id=>document.getElementById(id).addEventListener("input",calc));
+new ResizeObserver(calc).observe(document.getElementById("chart"));
+document.getElementById("links").innerHTML=linkHtml(ASP_LINKS.concat([{label:"楽天でNISAの本を探す",url:rakuten("新NISA 本 入門")}]));
+calc();
+</script></body></html>

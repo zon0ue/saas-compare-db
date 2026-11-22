@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>家電の電気代計算ツール｜暖房器具の1か月の電気代がわかる</title>
+<meta name="description" content="消費電力と使用時間を入れるだけで、エアコン・こたつ・ヒーターなど家電の1日・1か月・1年の電気代を計算できる無料ツール。">
+<style>:root{--c:#2a2a40}*{box-sizing:border-box}body{margin:0;font-family:"Hiragino Sans","Noto Sans JP",sans-serif;background:#fff8ec;color:#222;line-height:1.7}
+header{background:var(--c);color:#fff;padding:26px 16px 20px;text-align:center}header h1{margin:0;font-size:1.4rem}header p{margin:6px 0 0;opacity:.85;font-size:.9rem}
+.pr{font-size:.78rem;color:#888;text-align:center;margin:10px 0 0}main{max-width:640px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:16px;padding:20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+label{display:block;font-weight:700;color:#1f2d54;margin:14px 0 6px}.hint{font-weight:400;color:#888;font-size:.82rem}
+input,select{width:100%;font-size:16px;padding:10px 12px;border:2px solid #dde;border-radius:10px;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--c)}.row{display:flex;gap:10px}.row>div{flex:1}
+button{width:100%;margin-top:18px;padding:14px;font-size:1.05rem;font-weight:700;color:#fff;background:#c83232;border:0;border-radius:12px;cursor:pointer}
+button.sub{background:#fff;color:var(--c);border:2px solid var(--c);margin-top:10px;padding:10px}
+.res{text-align:center}.big{font-size:2.3rem;font-weight:900;color:#c83232;margin:4px 0}.muted{color:#5a5a5a;font-size:.9rem}
+h2{font-size:1.1rem;color:#1f2d54;margin:0 0 10px}.links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.links a{display:block;text-align:center;padding:13px 8px;border-radius:12px;color:#fff;text-decoration:none;font-weight:700;background:var(--c)}
+.links a.main{grid-column:1/-1;background:#c83232;font-size:1.05rem}.note{font-size:.8rem;color:#777}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{border-bottom:1px solid #eee;padding:6px 4px;text-align:right}th:first-child,td:first-child{text-align:left}
+footer{text-align:center;font-size:.75rem;color:#999;padding:24px 16px 40px}
+
+.item{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.2fr) minmax(0,0.9fr) 36px;gap:6px;align-items:end;margin-top:8px}
+.item input{padding:8px;font-size:16px}.item .x{background:none;border:0;color:#c83232;font-size:1.4rem;width:40px;margin:0;padding:6px}
+.head{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1.2fr) minmax(0,0.9fr) 36px;gap:6px;font-size:.8rem;color:#777;font-weight:700}
+</style></head><body>
+<header><h1>家電の電気代計算ツール</h1><p>消費電力×使用時間で、1か月の電気代がすぐわかる</p></header>
+<p class="pr">※このページはアフィリエイト広告（PR）を利用しています</p>
+<main>
+<div class="card">
+  <label>電気料金の単価<span class="hint">　円/kWh（明細でわかる。不明なら31円のまま）</span></label>
+  <input id="unit" type="number" inputmode="decimal" value="31" step="0.1">
+  <label>家電と使い方<span class="hint">　消費電力は製品の表示を入れるとより正確です</span></label>
+  <div class="head"><span>家電</span><span>消費電力(W)</span><span>1日の時間</span><span></span></div>
+  <div id="list"></div>
+  <button class="sub" id="add">＋ 家電を追加</button>
+</div>
+<div class="card res">
+  <div class="muted">1か月（30日）の電気代の合計</div>
+  <div class="big" id="total">-</div>
+  <div class="muted" id="sub"></div>
+</div>
+<div class="card"><h2>家電ごとの内訳</h2><table id="tbl"></table></div>
+<div class="card"><h2>電気代を下げるなら</h2>
+  <p class="note">座って過ごす時間はこたつや電気毛布、部屋全体はエアコン、窓は断熱シートで対策するのが効率的です。電力会社やプランの見直しも効果があります。</p>
+  <div class="links" id="links"></div></div>
+<div class="card"><h2>計算方法</h2><p class="note">電気代 ＝ 消費電力(W) ÷ 1000 × 使用時間 × 単価。初期値の31円/kWhは、全国家庭電気製品公正取引協議会が示す目安単価です。初期の消費電力は一般的な目安で、温度調整で出力が変わる家電は平均値にしています。実際の料金は契約プランや燃料費調整額で変わります。</p></div>
+</main>
+<footer>2026年11月時点の情報で作成</footer>
+<script>
+/* ===== 設定 ===== */
+const RAKUTEN_AFF_ID = "";
+const ASP_LINKS = [ { label:"電力会社を比較する", url:"", main:true } ];
+function affUrl(url){if(!RAKUTEN_AFF_ID)return url;return "https://hb.afl.rakuten.co.jp/hgc/"+RAKUTEN_AFF_ID+"/?pc="+encodeURIComponent(url)+"&m="+encodeURIComponent(url)}
+function rakuten(kw){return affUrl("https://search.rakuten.co.jp/search/mall/"+encodeURIComponent(kw)+"/")}
+function yen(n){return Math.round(n).toLocaleString("ja-JP")+"円"}
+function linkHtml(list){return list.filter(l=>l.url).map(l=>'<a class="'+(l.main?"main":"")+'" href="'+l.url+'" target="_blank" rel="sponsored noopener">'+l.label+'</a>').join("")}
+
+const PRESET = [["エアコン（暖房）",500,8],["こたつ",200,5],["電気毛布",40,8],["セラミックヒーター",1200,2]];
+const list = document.getElementById("list");
+function addRow(n="",w="",h=""){
+  const r=document.createElement("div"); r.className="item";
+  r.innerHTML='<input class="n" value="'+n+'" placeholder="例：テレビ"><input class="w" type="number" inputmode="numeric" value="'+w+'"><input class="h" type="number" inputmode="decimal" step="0.5" value="'+h+'"><button class="x" aria-label="削除">×</button>';
+  r.querySelector(".x").addEventListener("click",()=>{r.remove();calc()});
+  r.querySelectorAll("input").forEach(i=>i.addEventListener("input",calc));
+  list.appendChild(r);
+}
+function calc(){
+  const u=+document.getElementById("unit").value||0; let tot=0; let rows="<tr><th>家電</th><th>1日</th><th>1か月</th><th>1年</th></tr>";
+  list.querySelectorAll(".item").forEach(r=>{
+    const n=r.querySelector(".n").value||"家電", w=+r.querySelector(".w").value||0, h=+r.querySelector(".h").value||0;
+    const day=w/1000*h*u; tot+=day*30;
+    if(w&&h) rows+="<tr><td>"+n.replace(/</g,"&lt;")+"</td><td>"+yen(day)+"</td><td>"+yen(day*30)+"</td><td>"+yen(day*365)+"</td></tr>";
+  });
+  document.getElementById("total").textContent=yen(tot);
+  document.getElementById("sub").textContent="1年間使い続けると 約"+yen(tot/30*365);
+  document.getElementById("tbl").innerHTML=rows;
+}
+PRESET.forEach(p=>addRow(...p));
+document.getElementById("add").addEventListener("click",()=>addRow());
+document.getElementById("unit").addEventListener("input",calc);
+document.getElementById("links").innerHTML=linkHtml(ASP_LINKS.concat([
+  {label:"省エネエアコン",url:rakuten("エアコン 省エネ 6畳")},{label:"電気毛布",url:rakuten("電気毛布")},
+  {label:"こたつ",url:rakuten("こたつ 本体")},{label:"窓の断熱シート",url:rakuten("断熱シート 窓")}]));
+calc();
+</script></body></html>

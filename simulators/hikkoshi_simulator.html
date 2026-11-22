@@ -54,13 +54,16 @@ footer{text-align:center;font-size:.75rem;color:#999;padding:24px 16px 40px}
 <footer>2026年11月時点の公表データをもとに作成</footer>
 <script>
 /* ===== 設定 ===== 空欄のリンクは表示されません */
-const RAKUTEN_AFF_ID = "";          // 楽天アフィリエイトID
-const ASP_LINKS = [                  // ASPで発行した一括見積もりの広告リンク
-  { label: "一括見積もりで比較する（1）", url: "", main: true },
-  { label: "一括見積もりで比較する（2）", url: "", main: true },
-];
-function affUrl(url){if(!RAKUTEN_AFF_ID)return url;return "https://hb.afl.rakuten.co.jp/hgc/"+RAKUTEN_AFF_ID+"/?pc="+encodeURIComponent(url)+"&m="+encodeURIComponent(url)}
-function rakuten(kw){return affUrl("https://search.rakuten.co.jp/search/mall/"+encodeURIComponent(kw)+"/")}
+const RAKUTEN_LINKS = {
+ "エアコン 省エネ 6畳": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E3%2582%25A8%25E3%2582%25A2%25E3%2582%25B3%25E3%2583%25B3%2520%25E7%259C%2581%25E3%2582%25A8%25E3%2583%258D%25206%25E7%2595%25B3%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9",
+ "電気毛布": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E9%259B%25BB%25E6%25B0%2597%25E6%25AF%259B%25E5%25B8%2583%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9",
+ "こたつ 本体": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E3%2581%2593%25E3%2581%259F%25E3%2581%25A4%2520%25E6%259C%25AC%25E4%25BD%2593%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9",
+ "断熱シート 窓": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E6%2596%25AD%25E7%2586%25B1%25E3%2582%25B7%25E3%2583%25BC%25E3%2583%2588%2520%25E7%25AA%2593%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9",
+ "引っ越し ダンボール セット": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E5%25BC%2595%25E3%2581%25A3%25E8%25B6%258A%25E3%2581%2597%2520%25E3%2583%2580%25E3%2583%25B3%25E3%2583%259C%25E3%2583%25BC%25E3%2583%25AB%2520%25E3%2582%25BB%25E3%2583%2583%25E3%2583%2588%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9",
+ "新生活 家電セット": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E6%2596%25B0%25E7%2594%259F%25E6%25B4%25BB%2520%25E5%25AE%25B6%25E9%259B%25BB%25E3%2582%25BB%25E3%2583%2583%25E3%2583%2588%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9",
+ "新NISA 本 入門": "https://hb.afl.rakuten.co.jp/hgc/35b81baf.01118169.35b81bb0.d02de1f0/?pc=https%3A%2F%2Fsearch.rakuten.co.jp%2Fsearch%2Fmall%2F%25E6%2596%25B0NISA%2520%25E6%259C%25AC%2520%25E5%2585%25A5%25E9%2596%2580%2F&link_type=hybrid_url&ut=eyJwYWdlIjoidXJsIiwidHlwZSI6Imh5YnJpZF91cmwiLCJjb2wiOjF9"
+};
+function rakuten(kw){return RAKUTEN_LINKS[kw]||("https://search.rakuten.co.jp/search/mall/"+encodeURIComponent(kw)+"/")}
 function yen(n){return Math.round(n).toLocaleString("ja-JP")+"円"}
 function linkHtml(list){return list.filter(l=>l.url).map(l=>'<a class="'+(l.main?"main":"")+'" href="'+l.url+'" target="_blank" rel="sponsored noopener">'+l.label+'</a>').join("")}
 

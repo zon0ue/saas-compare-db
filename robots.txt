@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zon0ue.github.io/saas-compare-db/sitemap.xml
